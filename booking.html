@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym Coach Booking</title>
+    <!-- Font Awesome for Icons (kept for headings and modal) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --bg-color: #000;
+        --snd-bg-color: #111;
+        --text-color: #fff;
+        --main-color: #45ffca;
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: var(--bg-color);
+        background-attachment: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        color: var(--text-color);
+      }
+      .booking-container {
+        background: var(--snd-bg-color);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 450px;
+        animation: fadeIn 0.5s ease-in-out;
+        border: 1px solid var(--main-color);
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      h2 {
+        text-align: center;
+        color: var(--text-color);
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+      }
+      h2 i {
+        color: var(--main-color);
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-top: 15px;
+        color: var(--text-color);
+        font-size: 0.9rem;
+      }
+      select,
+      input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        border: 2px solid #333;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        background: #222;
+        color: var(--text-color);
+      }
+      select:focus,
+      input:focus {
+        border-color: var(--main-color);
+        box-shadow: 0 0 8px rgba(69, 255, 202, 0.3);
+        outline: none;
+      }
+      button {
+        width: 100%;
+        padding: 12px;
+        background: var(--main-color);
+        color: var(--bg-color);
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 20px;
+        position: relative;
+      }
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(69, 255, 202, 0.3);
+      }
+      button:active {
+        transform: translateY(0);
+      }
+      .loading {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 2px solid #333;
+        border-top: 2px solid var(--main-color);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease-in-out;
+      }
+      .modal-content {
+        background: var(--snd-bg-color);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+        max-height: 80vh;
+        overflow-y: auto;
+        border: 1px solid var(--main-color);
+        color: var(--text-color);
+      }
+      .close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--main-color);
+        transition: color 0.3s;
+      }
+      .close:hover {
+        color: var(--text-color);
+      }
+      .receipt-details {
+        margin-top: 20px;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #333;
+        align-items: center;
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .label {
+        font-weight: 600;
+        color: var(--text-color);
+        font-size: 0.9rem;
+      }
+      .label i {
+        color: var(--main-color);
+        margin-right: 5px;
+      }
+      .value {
+        color: var(--text-color);
+        font-size: 0.9rem;
+      }
+      .status {
+        font-weight: bold;
+        color: var(--main-color);
+      }
+      .thank-you {
+        text-align: center;
+        margin-top: 20px;
+        color: #ccc;
+        font-size: 0.9rem;
+      }
+      .modal button {
+        width: auto;
+        margin: 10px 5px;
+        padding: 10px 20px;
+        background: var(--main-color);
+        color: var(--bg-color);
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      .modal button:hover {
+        background: #3ae0b8;
+      }
+      .modal button i {
+        margin-right: 5px;
+      }
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .booking-container {
+          padding: 20px;
+          max-width: 90%;
+        }
+        h2 {
+          font-size: 1.5rem;
+        }
+        .modal-content {
+          padding: 20px;
+          max-width: 95%;
+        }
+        .detail-row {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .value {
+          margin-top: 5px;
+        }
+      }
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+        .booking-container {
+          padding: 15px;
+        }
+        select,
+        input {
+          font-size: 0.9rem;
+        }
+        button {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="booking-container">
+      <h2><i class="fas fa-dumbbell"></i> Gym Coach Booking</h2>
+      <form id="bookingForm">
+        <label for="purpose">Workout Purpose</label>
+        <select id="purpose" required>
+          <option value="">-- Select Purpose --</option>
+          <option value="cardio">Cardio</option>
+          <option value="strength">Strength Training</option>
+          <option value="yoga">Yoga</option>
+          <option value="crossfit">CrossFit</option>
+        </select>
+
+        <label for="coach">Coach</label>
+        <select id="coach" required>
+          <option value="">-- Select Coach --</option>
+        </select>
+
+        <label for="date">Select Date</label>
+        <input type="date" id="date" required />
+
+        <label for="time">Select Time</label>
+        <input type="time" id="time" required />
+
+        <label for="name">Your Name</label>
+        <input type="text" id="name" placeholder="Enter your name" required />
+
+        <button type="submit" id="submitBtn">
+          <span id="btnText">Book Now</span>
+          <div class="loading" id="loadingSpinner"></div>
+        </button>
+      </form>
+    </div>
+
+    <!-- Modal for Receipt -->
+    <div id="receiptModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-receipt"></i> Booking Receipt</h2>
+        <div class="receipt-details" id="modalReceiptDetails">
+          <!-- Receipt details will be populated here -->
+        </div>
+        <div class="thank-you">
+          <p>
+            Thank you for your booking! Your session is currently pending
+            confirmation.
+          </p>
+        </div>
+        <button onclick="window.print()">
+          <i class="fas fa-print"></i> Print Receipt
+        </button>
+        <button onclick="closeModal()">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const gymCoaches = [
+        { name: "Coach Alex", specialty: "cardio" },
+        { name: "Coach Mia", specialty: "strength" },
+        { name: "Coach Ryan", specialty: "yoga" },
+        { name: "Coach Liza", specialty: "crossfit" },
+        { name: "Coach Brandon", specialty: "cardio" },
+        { name: "Coach Hazel", specialty: "strength" },
+        { name: "Coach Marco", specialty: "yoga" },
+        { name: "Coach Tiffany", specialty: "crossfit" },
+      ];
+
+      const purposeSelect = document.getElementById("purpose");
+      const coachSelect = document.getElementById("coach");
+      const bookingForm = document.getElementById("bookingForm");
+      const receiptModal = document.getElementById("receiptModal");
+      const modalReceiptDetails = document.getElementById(
+        "modalReceiptDetails"
+      );
+      const submitBtn = document.getElementById("submitBtn");
+      const btnText = document.getElementById("btnText");
+      const loadingSpinner = document.getElementById("loadingSpinner");
+
+      purposeSelect.addEventListener("change", () => {
+        const selectedPurpose = purposeSelect.value;
+        coachSelect.innerHTML = '<option value="">-- Select Coach --</option>';
+        gymCoaches
+          .filter((c) => c.specialty === selectedPurpose)
+          .forEach((coach) => {
+            const option = document.createElement("option");
+            option.value = coach.name;
+            option.textContent = coach.name;
+            coachSelect.appendChild(option);
+          });
+      });
+
+      function openModal(booking) {
+        // Populate modal with booking details
+        modalReceiptDetails.innerHTML = "";
+        const details = [
+          { label: "Name", value: booking.user, icon: "fas fa-user" },
+          {
+            label: "Workout Purpose",
+            value:
+              booking.purpose.charAt(0).toUpperCase() +
+              booking.purpose.slice(1),
+            icon: "fas fa-running",
+          },
+          { label: "Coach", value: booking.coach, icon: "fas fa-user-tie" },
+          {
+            label: "Date",
+            value: new Date(booking.date).toLocaleDateString(),
+            icon: "fas fa-calendar-alt",
+          },
+          { label: "Time", value: booking.time, icon: "fas fa-clock" },
+          {
+            label: "Status",
+            value: booking.status,
+            class: "status",
+            icon: "fas fa-info-circle",
+          },
+        ];
+        details.forEach((detail) => {
+          const row = document.createElement("div");
+          row.className = "detail-row";
+          row.innerHTML = `
+            <span class="label"><i class="${detail.icon}"></i> ${
+            detail.label
+          }:</span>
+            <span class="value ${detail.class || ""}">${detail.value}</span>
+          `;
+          modalReceiptDetails.appendChild(row);
+        });
+        receiptModal.style.display = "flex";
+      }
+
+      function closeModal() {
+        receiptModal.style.display = "none";
+      }
+
+      bookingForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        // Show loading
+        btnText.style.display = "none";
+        loadingSpinner.style.display = "block";
+        submitBtn.disabled = true;
+
+        const booking = {
+          user: document.getElementById("name").value,
+          purpose: purposeSelect.value,
+          coach: coachSelect.value,
+          date: document.getElementById("date").value,
+          time: document.getElementById("time").value,
+          status: "Pending",
+        };
+
+        // Simulate processing delay (optional, for UX)
+        setTimeout(() => {
+          // Save for receipt
+          localStorage.setItem("lastBooking", JSON.stringify(booking));
+
+          // Save all bookings
+          let allBookings =
+            JSON.parse(localStorage.getItem("gymBookings")) || [];
+          allBookings.push(booking);
+          localStorage.setItem("gymBookings", JSON.stringify(allBookings));
+
+          // Hide loading and open modal
+          btnText.style.display = "inline";
+          loadingSpinner.style.display = "none";
+          submitBtn.disabled = false;
+          openModal(booking);
+        }, 1000); // 1-second delay for demo
+      });
+    </script>
+  </body>
+</html>
